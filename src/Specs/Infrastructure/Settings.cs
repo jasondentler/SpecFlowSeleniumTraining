@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Configuration;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using Microsoft.Win32;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
