@@ -7,7 +7,7 @@ namespace UI.Controllers
         //
         // GET: /Home/
 
-        public RedirectToRouteResult Index()
+        public ActionResult Index()
         {
             return View();
         }
