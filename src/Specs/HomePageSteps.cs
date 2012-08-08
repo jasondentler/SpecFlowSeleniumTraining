@@ -1,21 +1,23 @@
-﻿using TechTalk.SpecFlow;
+﻿using SharpTestsEx;
+using TechTalk.SpecFlow;
 
 namespace Specs
 {
     [Binding]
-    public class HomePageSteps
+    public class HomePageSteps : Infrastructure.WebSteps
     {
         
         [When(@"I visit the home page")]
         public void WhenIVisitTheHomePage()
         {
-            ScenarioContext.Current.Pending();
+            Browser.Navigate().GoToUrl(BaseUrl);
         }
 
         [Then(@"the page redirects to the widget list")]
         public void ThenThePageRedirectsToTheWidgetList()
         {
-            ScenarioContext.Current.Pending();
+            RelativeUrl().ToString()
+                .Should().Be.EqualTo("/widgets");
         }
 
     }

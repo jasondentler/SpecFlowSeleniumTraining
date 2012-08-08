@@ -95,3 +95,6 @@ Thumbs.db
 # Folder config file
 Desktop.ini
 
+#Custom ignore
+output
+

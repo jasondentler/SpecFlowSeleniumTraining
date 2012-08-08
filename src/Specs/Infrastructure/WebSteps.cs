@@ -15,5 +15,20 @@ namespace Specs.Infrastructure
             return (WebConfiguration) ScenarioContext.Current.GetBindingInstance(typeof (WebConfiguration));
         }
 
+        public Uri RelativeUrl()
+        {
+            return RelativeUrl(Browser.Url);
+        }
+
+        public Uri RelativeUrl(string absoluteUrl)
+        {
+            return RelativeUrl(new Uri(absoluteUrl, UriKind.Absolute));
+        }
+
+        public Uri RelativeUrl(Uri absoluteUri)
+        {
+            return absoluteUri.MakeRelativeUri(BaseUrl);
+        }
+
     }
 }
