@@ -23,18 +23,6 @@ namespace UI.Controllers
         {
             throw new NotImplementedException();
         }
-
-        [HttpGet]
-        public ViewResult Edit(int id)
-        {
-            throw new NotImplementedException();
-        }
-
-        [HttpGet]
-        public ViewResult Delete(int id)
-        {
-            throw new NotImplementedException();
-        }
         
     }
 }
