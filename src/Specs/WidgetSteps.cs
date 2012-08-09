@@ -1,9 +1,13 @@
-﻿using TechTalk.SpecFlow;
+﻿using System;
+using OpenQA.Selenium;
+using SharpTestsEx;
+using Specs.Infrastructure;
+using TechTalk.SpecFlow;
 
 namespace Specs
 {
     [Binding]
-    public class WidgetSteps
+    public class WidgetSteps : WebSteps 
     {
 
         [Given(@"I have added one widget")]
@@ -22,7 +26,7 @@ namespace Specs
         [When(@"I create a widget")]
         public void WhenICreateAWidget()
         {
-            ScenarioContext.Current.Pending();
+            CreateWidget();
         }
 
         [When(@"I display the widget")]
@@ -47,7 +51,8 @@ namespace Specs
         [Then(@"the widget is displayed")]
         public void ThenTheWidgetIsDisplayed()
         {
-            ScenarioContext.Current.Pending();
+            RelativeUrl().ToString()
+                .Should().Match(@"/widgets/\d+");
         }
 
         [Then(@"the error message is ""(.*)""")]
@@ -60,6 +65,14 @@ namespace Specs
         public void ThenTwoWidgetsAreListed()
         {
             ScenarioContext.Current.Pending();
+        }
+
+        private void CreateWidget()
+        {
+            Browser.Navigate().GoToUrl("/widgets/create");
+            Browser.FindElement(By.Name("Name")).SendKeys(Guid.NewGuid().ToString());
+            Browser.FindElement(By.Name("Size")).SendKeys("34.6");
+            Browser.FindElement(By.Name("Submit")).Click();
         }
 
     }
