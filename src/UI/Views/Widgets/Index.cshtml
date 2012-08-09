@@ -1,0 +1,21 @@
+﻿@model UI.Models.WidgetDetails
+
+@{       
+    ViewBag.Title = Model == null ? "Not found" : Model.Name;
+}
+
+@if (Model == null)
+{
+    <div class="error">Sorry. I couldn't find that widget.</div>
+}
+else
+{
+    <div>
+        @Html.LabelFor(m => m.Name)<br/>
+        @Html.DisplayFor(m => m.Name)
+    </div>
+    <div>
+        @Html.LabelFor(m => m.Size)<br/>
+        @Html.DisplayFor(m => m.Size)
+    </div>
+}

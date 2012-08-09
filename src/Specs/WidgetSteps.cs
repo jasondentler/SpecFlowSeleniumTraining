@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using OpenQA.Selenium;
 using SharpTestsEx;
 using Specs.Infrastructure;
 using TechTalk.SpecFlow;
@@ -12,7 +13,6 @@ namespace Specs
     [Binding]
     public class WidgetSteps : WebSteps 
     {
-
 
         [Given(@"I have added one widget")]
         [Given(@"I have added a widget")]
@@ -48,21 +48,31 @@ namespace Specs
         [When(@"I display a widget that doesn't exist")]
         public void WhenIDisplayAWidgetThatDoesnTExist()
         {
-            ScenarioContext.Current.Pending();
+            NavigateTo("/widgets/-1");
         }
 
         [Then(@"the widget details are displayed")]
         [Then(@"the widget is displayed")]
         public void ThenTheWidgetIsDisplayed()
         {
-            var expectedUrl = string.Format(@"widgets/{0}", _widgets.Single().Id);
+            var widget = _widgets.Single();
+
+            var expectedUrl = string.Format(@"widgets/{0}", widget.Id);
             RelativeUrl().ToString().Should().Be.EqualTo(expectedUrl);
+
+            var form = new MvcFormHelper<WidgetDetails>(Browser);
+
+            form.Get(m => m.Name).Should().Be.EqualTo(widget.Name);
+
+            Math.Abs(form.Get(m => m.Size) - widget.Size)
+                .Should().Be.LessThan(Epsilon);
         }
 
         [Then(@"the error message is ""(.*)""")]
-        public void ThenTheErrorMessageIs(string p0)
+        public void ThenTheErrorMessageIs(string expected)
         {
-            ScenarioContext.Current.Pending();
+            var actual = Browser.FindElement(By.ClassName("error")).Text;
+            actual.Should().Be.EqualTo(expected);
         }
 
         [Then(@"two widgets are listed")]
@@ -72,6 +82,7 @@ namespace Specs
         }
 
         private readonly List<WidgetDetails> _widgets = new List<WidgetDetails>();
+        private const float Epsilon = 0.0000001F;
 
         private void CreateWidget()
         {
@@ -86,8 +97,8 @@ namespace Specs
         {
             NavigateTo("/widgets/create");
             var form = new MvcFormHelper<WidgetDetails>(Browser);
-            form.Set(m => m.Name, Guid.NewGuid().ToString());
-            form.Set(m => m.Size, 34.6);
+            form.Set(m => m.Name, widget.Name);
+            form.Set(m => m.Size, widget.Size);
             form.Submit(m => m.Name);
 
             var match = new Regex(@"^widgets/(?<id>\d+)$").Match(RelativeUrl().ToString());

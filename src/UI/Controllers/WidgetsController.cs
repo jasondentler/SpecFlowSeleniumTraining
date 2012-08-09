@@ -1,5 +1,4 @@
-﻿using System;
-using System.Web.Mvc;
+﻿using System.Web.Mvc;
 using MvcContrib.Filters;
 using UI.DataAccess;
 using UI.Models;
@@ -17,21 +16,22 @@ namespace UI.Controllers
         }
 
         [HttpGet]
-        public ViewResult List()
+        public ActionResult List()
         {
-            throw new NotImplementedException();
+            return Content(string.Empty);
         }
 
         [HttpGet]
         public ViewResult Index(int id)
         {
-            throw new NotImplementedException();
+            var widget = _dao.Get(id);
+            return View(widget);
         }
 
         [HttpGet, ModelStateToTempData]
         public ViewResult Create()
         {
-            return View(new WidgetDetails());
+            return View();
         }
 
         [HttpPost, ModelStateToTempData]

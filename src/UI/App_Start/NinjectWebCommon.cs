@@ -1,3 +1,5 @@
+using System.Reflection;
+
 [assembly: WebActivator.PreApplicationStartMethod(typeof(UI.App_Start.NinjectWebCommon), "Start")]
 [assembly: WebActivator.ApplicationShutdownMethodAttribute(typeof(UI.App_Start.NinjectWebCommon), "Stop")]
 
@@ -53,6 +55,7 @@ namespace UI.App_Start
         /// <param name="kernel">The kernel.</param>
         private static void RegisterServices(IKernel kernel)
         {
+            kernel.Load(Assembly.GetExecutingAssembly());
         }        
     }
 }
