@@ -97,6 +97,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Site.feature</DependentUpon>
     </Compile>
+    <Compile Include="WidgetSteps.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
