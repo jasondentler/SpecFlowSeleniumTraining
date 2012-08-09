@@ -28,16 +28,6 @@ namespace UI
                 defaults: new { controller = "Widgets", action = "List" });
 
             routes.MapRoute(
-                name: "WidgetsEdit",
-                url: "widgets/edit/{id}",
-                defaults: new { controller = "Widgets", action = "Edit" });
-
-            routes.MapRoute(
-                name: "WidgetsDelete",
-                url: "widgets/delete/1",
-                defaults: new { controller = "Widgets", action = "Delete" });
-
-            routes.MapRoute(
                 name: "WidgetsCreate",
                 url: "widgets/create",
                 defaults: new { controller = "Widgets", action = "Create" });
