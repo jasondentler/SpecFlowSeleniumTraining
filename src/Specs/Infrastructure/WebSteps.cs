@@ -8,7 +8,7 @@ namespace Specs.Infrastructure
     public abstract class WebSteps
     {
 
-        public IWebDriver Browser { get { return GetWebConfiguration().WebDriver; } }
+        public IWebDriver Browser { get { return GetWebConfiguration().Browser; } }
         public Uri BaseUrl { get { return GetWebConfiguration().Url; } }
 
         private WebConfiguration GetWebConfiguration()

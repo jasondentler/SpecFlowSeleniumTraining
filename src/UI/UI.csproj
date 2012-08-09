@@ -109,6 +109,7 @@
     <Compile Include="App_Start\RavenModule.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\WidgetsController.cs" />
+    <Compile Include="Models\WidgetSummary.cs" />
     <Compile Include="RavenGlobalFilter.cs" />
     <Compile Include="DataAccess\WidgetDAO.cs" />
     <Compile Include="Global.asax.cs">
@@ -192,6 +193,15 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Shared\DisplayTemplates\String.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Widgets\List.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Widgets\WidgetNotFound.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Widgets\NoWidgetsFound.cshtml" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" />

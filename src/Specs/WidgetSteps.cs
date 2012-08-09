@@ -18,13 +18,14 @@ namespace Specs
         [Given(@"I have added a widget")]
         public void GivenIHaveAddedAWidget()
         {
-            ScenarioContext.Current.Pending();
+            CreateWidget();
         }
 
         [Given(@"I have added two widgets")]
         public void GivenIHaveAddedTwoWidgets()
         {
-            ScenarioContext.Current.Pending();
+            CreateWidget();
+            CreateWidget();
         }
 
         [When(@"I create a widget")]
@@ -36,13 +37,15 @@ namespace Specs
         [When(@"I display the widget")]
         public void WhenIDisplayTheWidget()
         {
-            ScenarioContext.Current.Pending();
+            var widget = _widgets.Single();
+            var url = string.Format("/widgets/{0}", widget.Id);
+            NavigateTo(url);
         }
 
         [When(@"I view the widget list")]
         public void WhenIViewTheWidgetList()
         {
-            ScenarioContext.Current.Pending();
+            NavigateTo("/widgets");
         }
 
         [When(@"I display a widget that doesn't exist")]
@@ -78,11 +81,26 @@ namespace Specs
         [Then(@"two widgets are listed")]
         public void ThenTwoWidgetsAreListed()
         {
-            ScenarioContext.Current.Pending();
+            var expected = _widgets.ToDictionary(widget => widget.Id,
+                                                 widget => widget.Name);
+
+            var widgetLinks = Browser.FindElements(By.XPath(""));
+
+            var getIdFromUrl = new Func<string, int>(url =>
+                                                         {
+                                                             var regex = new Regex(@"/widgets/(?<id>\d+)$");
+                                                             return Convert.ToInt32(regex.Match(url).Groups["id"].Value);
+                                                         });
+
+            var actual = widgetLinks.ToDictionary(
+                link => getIdFromUrl(link.GetAttribute("href")),
+                link => link.Text);
+
+            actual.Should().Have.SameValuesAs(expected);
         }
 
         private readonly List<WidgetDetails> _widgets = new List<WidgetDetails>();
-        private const float Epsilon = 0.0000001F;
+        private const float Epsilon = 0.0001F;
 
         private void CreateWidget()
         {

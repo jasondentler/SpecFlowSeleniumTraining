@@ -1,4 +1,5 @@
-﻿using System.Web.Mvc;
+﻿using System.Linq;
+using System.Web.Mvc;
 using MvcContrib.Filters;
 using UI.DataAccess;
 using UI.Models;
@@ -18,14 +19,26 @@ namespace UI.Controllers
         [HttpGet]
         public ActionResult List()
         {
-            return Content(string.Empty);
+            var widgets = _dao.GetAll().ToArray();
+
+            switch (widgets.Count())
+            {
+                case 0:
+                    return View("NoWidgetsFound");
+                case 1:
+                    return this.RedirectToAction(c => c.Index(widgets.Single().Id));
+                default:
+                    return View(widgets);
+            }
         }
 
         [HttpGet]
         public ViewResult Index(int id)
         {
             var widget = _dao.Get(id);
-            return View(widget);
+            return widget == null 
+                ? View("WidgetNotFound") 
+                : View(widget);
         }
 
         [HttpGet, ModelStateToTempData]

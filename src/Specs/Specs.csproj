@@ -93,6 +93,7 @@
       <DependentUpon>DisplayWidgets.feature</DependentUpon>
     </Compile>
     <Compile Include="HomePageSteps.cs" />
+    <Compile Include="Infrastructure\BrowserInstance.cs" />
     <Compile Include="Infrastructure\IISProcess.cs" />
     <Compile Include="Infrastructure\MvcFormHelper.cs" />
     <Compile Include="Infrastructure\RavenProcess.cs" />

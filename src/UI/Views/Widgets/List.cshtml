@@ -1,0 +1,12 @@
+﻿@model IEnumerable<WidgetSummary>
+
+@{
+    ViewBag.Title = "Widgets";
+}
+<ul id="widgetList">
+@foreach(var widget in Model)
+{
+    var widget1 = widget;
+    <li>@(Html.ActionLink<WidgetsController>(c => c.Index(widget1.Id),widget1.Name))</li>
+}
+</ul>

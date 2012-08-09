@@ -13,9 +13,7 @@ namespace Specs.Infrastructure
     {
 
         private static IISProcess _iisProcess;
-        private static IWebDriver _driver;
-        private static string _mainWindow;
-
+        private static BrowserInstance _browserInstance;
         private RavenInstance _ravenInstance;
 
         [BeforeTestRun]
@@ -23,8 +21,9 @@ namespace Specs.Infrastructure
         {
             _iisProcess = new IISProcess(8082);
             _iisProcess.Start();
-            _driver = Settings.CreateWebDriver();
-            _mainWindow = _driver.CurrentWindowHandle;
+
+            if (Settings.BrowserScope == Settings.BrowserScopes.Singleton)
+                StartBrowser();
         }
 
         [AfterTestRun]
@@ -32,27 +31,36 @@ namespace Specs.Infrastructure
         {
             _iisProcess.Stop();
             _iisProcess.Dispose();
+            if (Settings.BrowserScope == Settings.BrowserScopes.Singleton)
+                StopBrowser();
+        }
 
-            _driver.WindowHandles.ToList()
-                .ForEach(handle =>
-                             {
-                                 _driver.SwitchTo().Window(handle);
-                                 _driver.Close();
-                             });
+        [BeforeFeature("web")]
+        public static void SetupFeature()
+        {
+            if (Settings.BrowserScope == Settings.BrowserScopes.Feature)
+                StartBrowser();
+        }
 
-            _driver.Dispose();
-            TerminateSeleniumDrivers();
+        [AfterFeature("web")]
+        public static void AfterFeature()
+        {
+            if (Settings.BrowserScope == Settings.BrowserScopes.Feature)
+                StopBrowser();
         }
 
         [BeforeScenario("web")]
         public void Setup()
         {
+            if (Settings.BrowserScope == Settings.BrowserScopes.Scenario)
+                StartBrowser();
+
             _ravenInstance = new RavenInstance();
 
-            ScenarioContext.Current.Set(_driver);
+            ScenarioContext.Current.Set(_browserInstance.Browser);
             ScenarioContext.Current.Set(_iisProcess.Url);
             
-            CleanUpBrowserInstance();
+            _browserInstance.Reset();
         }
 
         [AfterScenario("web")]
@@ -60,6 +68,9 @@ namespace Specs.Infrastructure
         {
             _ravenInstance.Dispose();
             CaptureErrorInformation();
+
+            if (Settings.BrowserScope == Settings.BrowserScopes.Scenario)
+                StopBrowser();
         }
 
         private static void CaptureErrorInformation()
@@ -108,37 +119,26 @@ namespace Specs.Infrastructure
             return path;
         }
 
-        private static string BrowserName { get { return _driver.GetType().Name.Replace("Driver", string.Empty); } }
+        private static string BrowserName { get { return BrowserName.GetType().Name.Replace("Driver", string.Empty); } }
 
         private void CleanUpBrowserInstance()
         {
-            _mainWindow = _driver.WindowHandles.Contains(_mainWindow)
-                              ? _mainWindow
-                              : _driver.CurrentWindowHandle;
-
-            _driver.WindowHandles.Except(new[] { _mainWindow })
-                .ToList()
-                .ForEach(handle =>
-                {
-                    _driver.SwitchTo().Window(handle);
-                    _driver.Close();
-                });
-
-            _driver.Navigate().GoToUrl("about:blank");
-            _driver.Manage().Cookies.DeleteAllCookies();
         }
 
-        private static void TerminateSeleniumDrivers()
+
+        private static void StartBrowser()
         {
-            Process.GetProcessesByName("chromedriver")
-                .Union(Process.GetProcessesByName("iedriverserver"))
-                .ToList()
-                .ForEach(p => p.Kill());
+            _browserInstance = new BrowserInstance();
         }
 
-        public IWebDriver WebDriver { get { return _driver; }}
+        private static void StopBrowser()
+        {
+            _browserInstance.Dispose();
+            _browserInstance = null;
+        }
+
+        public IWebDriver Browser { get { return _browserInstance.Browser; }}
 
         public Uri Url { get { return _iisProcess.Url; }}
-
     }
 }

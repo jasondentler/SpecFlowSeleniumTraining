@@ -15,9 +15,17 @@ namespace Specs.Infrastructure
     public static class Settings
     {
 
+        public enum BrowserScopes
+        {
+            Scenario,
+            Feature,
+            Singleton
+        }
+
         private const string IISExpressPathKey = "IISExpressPath";
         private const string WebsitePathKey = "WebsitePath";
         private const string BrowserKey = "Browser";
+        private const string BrowserScopeKey = "BrowserScope";
         private const string ChromeExecutableKey = "ChromeExecutable";
         private const string RavenDbExecutablePathKey = "RavenDBExecutablePath";
         private const string TestOutputDirectoryKey = "TestOutputDirectory";
@@ -36,6 +44,23 @@ namespace Specs.Infrastructure
         public static string RavenDbExecutablePath
         {
             get { return GetValue(RavenDbExecutablePathKey) ?? GetRavenDbServicePath(); }
+        }
+
+        public static BrowserScopes BrowserScope
+        {
+            get
+            {
+                var value = GetValue(BrowserScopeKey) ?? "Singleton";
+                switch (value.ToLowerInvariant())
+                {
+                    case "feature":
+                        return BrowserScopes.Feature;
+                    case "scenario":
+                        return BrowserScopes.Scenario;
+                    default:
+                        return BrowserScopes.Singleton;
+                }
+            }
         }
 
         public static string TestOutputDirectory { get { return GetValue(TestOutputDirectoryKey) ?? "."; } }
