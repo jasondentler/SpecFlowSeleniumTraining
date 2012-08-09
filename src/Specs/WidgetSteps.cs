@@ -1,16 +1,18 @@
 ﻿using System;
-using System.Threading;
-using OpenQA.Selenium;
-using OpenQA.Selenium.Support.UI;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
 using SharpTestsEx;
 using Specs.Infrastructure;
 using TechTalk.SpecFlow;
+using UI.Models;
 
 namespace Specs
 {
     [Binding]
     public class WidgetSteps : WebSteps 
     {
+
 
         [Given(@"I have added one widget")]
         [Given(@"I have added a widget")]
@@ -53,8 +55,8 @@ namespace Specs
         [Then(@"the widget is displayed")]
         public void ThenTheWidgetIsDisplayed()
         {
-            RelativeUrl().ToString()
-                .Should().Match(@"widgets/\d+");
+            var expectedUrl = string.Format(@"widgets/{0}", _widgets.Single().Id);
+            RelativeUrl().ToString().Should().Be.EqualTo(expectedUrl);
         }
 
         [Then(@"the error message is ""(.*)""")]
@@ -69,17 +71,31 @@ namespace Specs
             ScenarioContext.Current.Pending();
         }
 
+        private readonly List<WidgetDetails> _widgets = new List<WidgetDetails>();
+
         private void CreateWidget()
         {
+            CreateWidget(new WidgetDetails()
+                             {
+                                 Name = Guid.NewGuid().ToString(),
+                                 Size = Convert.ToSingle(new Random().NextDouble()*50)
+                             });
+        }
+
+        private void CreateWidget(WidgetDetails widget)
+        {
             NavigateTo("/widgets/create");
+            var form = new MvcFormHelper<WidgetDetails>(Browser);
+            form.Set(m => m.Name, Guid.NewGuid().ToString());
+            form.Set(m => m.Size, 34.6);
+            form.Submit(m => m.Name);
 
-            var name = Browser.FindElement(By.Id("Name"));
-            var size = Browser.FindElement(By.Name("Size"));
-
-            name.SendKeys(Guid.NewGuid().ToString());
-            size.SendKeys("34.6");
-
-            name.Submit();
+            var match = new Regex(@"^widgets/(?<id>\d+)$").Match(RelativeUrl().ToString());
+            if (match.Success)
+            {
+                widget.Id = Convert.ToInt32(match.Groups["id"].Value);
+                _widgets.Add(widget);
+            }
         }
     }
 }
