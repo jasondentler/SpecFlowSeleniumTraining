@@ -16,8 +16,9 @@ namespace Specs
         [Then(@"the page redirects to the widget list")]
         public void ThenThePageRedirectsToTheWidgetList()
         {
-            RelativeUrl().ToString()
-                .Should().Be.EqualTo("/widgets");
+            var url = RelativeUrl().ToString();
+
+            url.Should().Be.EqualTo("widgets");
         }
 
     }

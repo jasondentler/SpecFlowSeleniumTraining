@@ -27,7 +27,7 @@ namespace Specs.Infrastructure
 
         public Uri RelativeUrl(Uri absoluteUri)
         {
-            return absoluteUri.MakeRelativeUri(BaseUrl);
+            return BaseUrl.MakeRelativeUri(absoluteUri);
         }
 
     }

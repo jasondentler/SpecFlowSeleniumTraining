@@ -20,33 +20,33 @@ namespace UI
             routes.MapRoute(
                 name: "WidgetsIndex",
                 url: "widgets/{id}",
-                defaults: new { controller = "Widget", action = "Index" });
+                defaults: new { controller = "Widgets", action = "Index" });
 
             routes.MapRoute(
                 name: "WidgetsList",
                 url: "widgets",
-                defaults: new { controller = "Widget", action = "List" });
+                defaults: new { controller = "Widgets", action = "List" });
 
             routes.MapRoute(
                 name: "WidgetsEdit",
                 url: "widgets/edit/{id}",
-                defaults: new { controller = "Widget", action = "Edit" });
+                defaults: new { controller = "Widgets", action = "Edit" });
 
             routes.MapRoute(
                 name: "WidgetsDelete",
                 url: "widgets/delete/1",
-                defaults: new { controller = "Widget", action = "Delete" });
+                defaults: new { controller = "Widgets", action = "Delete" });
 
             routes.MapRoute(
                 name: "WidgetsCreate",
                 url: "widgets/create",
-                defaults: new { controller = "Widget", action = "Create" });
+                defaults: new { controller = "Widgets", action = "Create" });
 
             routes.MapRoute(
-                "Default", // Route name
-                "{controller}/{action}/{id}", // URL with parameters
-                new { controller = "Home", action = "Index", id = UrlParameter.Optional } // Parameter defaults
-            );
+                "Default",
+                "{*parameters}",
+                new {controller = "Home", action = "Index", parameters = UrlParameter.Optional, id = UrlParameter.Optional});
+
 
         }
 

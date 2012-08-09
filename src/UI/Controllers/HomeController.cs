@@ -1,4 +1,5 @@
 ﻿using System.Web.Mvc;
+using MvcContrib;
 
 namespace UI.Controllers
 {
@@ -7,9 +8,9 @@ namespace UI.Controllers
         //
         // GET: /Home/
 
-        public ActionResult Index()
+        public RedirectToRouteResult Index()
         {
-            return View();
+            return this.RedirectToAction<WidgetsController>(c => c.List());
         }
 
     }
