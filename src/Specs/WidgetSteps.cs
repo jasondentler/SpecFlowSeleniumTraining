@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Threading;
 using OpenQA.Selenium;
+using OpenQA.Selenium.Support.UI;
 using SharpTestsEx;
 using Specs.Infrastructure;
 using TechTalk.SpecFlow;
@@ -52,7 +54,7 @@ namespace Specs
         public void ThenTheWidgetIsDisplayed()
         {
             RelativeUrl().ToString()
-                .Should().Match(@"/widgets/\d+");
+                .Should().Match(@"widgets/\d+");
         }
 
         [Then(@"the error message is ""(.*)""")]
@@ -69,11 +71,15 @@ namespace Specs
 
         private void CreateWidget()
         {
-            Browser.Navigate().GoToUrl("/widgets/create");
-            Browser.FindElement(By.Name("Name")).SendKeys(Guid.NewGuid().ToString());
-            Browser.FindElement(By.Name("Size")).SendKeys("34.6");
-            Browser.FindElement(By.Name("Submit")).Click();
-        }
+            NavigateTo("/widgets/create");
 
+            var name = Browser.FindElement(By.Id("Name"));
+            var size = Browser.FindElement(By.Name("Size"));
+
+            name.SendKeys(Guid.NewGuid().ToString());
+            size.SendKeys("34.6");
+
+            name.Submit();
+        }
     }
 }

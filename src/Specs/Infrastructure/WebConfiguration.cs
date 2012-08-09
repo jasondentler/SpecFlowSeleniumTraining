@@ -59,32 +59,53 @@ namespace Specs.Infrastructure
         public void AfterWebScenario()
         {
             _ravenInstance.Dispose();
-            TakeErrorScreenshot();
+            CaptureErrorInformation();
         }
 
-        private static void TakeErrorScreenshot()
+        private static void CaptureErrorInformation()
         {
             var ctx = ScenarioContext.Current;
             if (ctx.TestError == null)
                 return;
+
             var driver = ScenarioContext.Current.Get<IWebDriver>();
+            
+            CaptureHtml(driver);
+            
             var screenshotter = driver as ITakesScreenshot;
             if (screenshotter != null)
-                TakeErrorScreenshot(screenshotter, ctx.ScenarioInfo.Title);
+                TakeErrorScreenshot(screenshotter);
         }
 
-        private static void TakeErrorScreenshot(ITakesScreenshot screenshotter, string testName)
+        private static void TakeErrorScreenshot(ITakesScreenshot screenshotter)
         {
-            var dir = Path.GetFullPath(Settings.SnapshotDirectory);
+            var path = GetOutputDirectoryFilePath("bmp");
+            screenshotter.GetScreenshot().SaveAsFile(path, ImageFormat.Bmp);
+            Console.Error.WriteLine("Screenshot: [\"" + path + "\"]");
+        }
+        
+        private static void CaptureHtml(IWebDriver driver)
+        {
+            var path = GetOutputDirectoryFilePath("html");
+            File.WriteAllText(path, driver.PageSource);
+            Console.Error.WriteLine("Html: [\"" + path + "\"]");
+        }
+
+        private static string GetOutputDirectoryFilePath(string extensionWithoutPeriod)
+        {
+
+            var testName = ScenarioContext.Current.ScenarioInfo.Title;
+
+            var dir = Path.GetFullPath(Settings.TestOutputDirectory);
 
             if (!Directory.Exists(dir))
                 Directory.CreateDirectory(dir);
 
-            var fileName = string.Format("{0}.{1}.bmp", testName, BrowserName);
+            var fileName = string.Format("{0}.{1}.{2}", testName, BrowserName, extensionWithoutPeriod);
 
             var path = Path.Combine(dir, fileName);
-            screenshotter.GetScreenshot().SaveAsFile(path, ImageFormat.Bmp);
-            Console.Error.WriteLine("Screenshot: [\"" + path + "\"]");
+
+            return path;
         }
 
         private static string BrowserName { get { return _driver.GetType().Name.Replace("Driver", string.Empty); } }

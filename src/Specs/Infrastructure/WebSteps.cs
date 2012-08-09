@@ -30,5 +30,11 @@ namespace Specs.Infrastructure
             return BaseUrl.MakeRelativeUri(absoluteUri);
         }
 
+        public void NavigateTo(string url)
+        {
+            var absoluteUrl = new Uri(BaseUrl, url);
+            Browser.Navigate().GoToUrl(absoluteUrl);
+        }
+
     }
 }

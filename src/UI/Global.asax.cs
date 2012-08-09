@@ -18,6 +18,11 @@ namespace UI
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
 
             routes.MapRoute(
+                name: "WidgetsCreate",
+                url: "widgets/create",
+                defaults: new { controller = "Widgets", action = "Create" });
+
+            routes.MapRoute(
                 name: "WidgetsIndex",
                 url: "widgets/{id}",
                 defaults: new { controller = "Widgets", action = "Index" });
@@ -26,11 +31,6 @@ namespace UI
                 name: "WidgetsList",
                 url: "widgets",
                 defaults: new { controller = "Widgets", action = "List" });
-
-            routes.MapRoute(
-                name: "WidgetsCreate",
-                url: "widgets/create",
-                defaults: new { controller = "Widgets", action = "Create" });
 
             routes.MapRoute(
                 "Default",

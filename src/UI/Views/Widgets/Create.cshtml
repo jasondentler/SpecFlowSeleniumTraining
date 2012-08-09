@@ -1,0 +1,18 @@
+﻿@model UI.Models.WidgetDetails
+
+@{
+    ViewBag.Title = "Create Widget";
+}
+
+@using (Html.BeginForm())
+{
+    <div>
+        @Html.LabelFor(m => m.Name)<br/>
+        @Html.TextBoxFor(m => m.Name)
+    </div>
+    <div>
+        @Html.LabelFor(m => m.Size)
+        @Html.TextBoxFor(m => m.Size)
+    </div>
+    <input type="submit" name="Submit" value="Create"/>
+}

@@ -20,7 +20,7 @@ namespace Specs.Infrastructure
         private const string BrowserKey = "Browser";
         private const string ChromeExecutableKey = "ChromeExecutable";
         private const string RavenDbExecutablePathKey = "RavenDBExecutablePath";
-        private const string SnapshotDirectoryKey = "SnapshotDirectory";
+        private const string TestOutputDirectoryKey = "TestOutputDirectory";
 
         public static string IISExpressPath
         {
@@ -38,7 +38,7 @@ namespace Specs.Infrastructure
             get { return GetValue(RavenDbExecutablePathKey) ?? GetRavenDbServicePath(); }
         }
 
-        public static string SnapshotDirectory { get { return GetValue(SnapshotDirectoryKey) ?? "."; } }
+        public static string TestOutputDirectory { get { return GetValue(TestOutputDirectoryKey) ?? "."; } }
 
         public static IWebDriver CreateWebDriver()
         {
