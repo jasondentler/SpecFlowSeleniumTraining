@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Linq.Expressions;
 using System.Web.Mvc;
 using OpenQA.Selenium;
@@ -14,6 +15,14 @@ namespace Specs.Infrastructure
             _driver = driver;
         }
         
+        public TProperty Get<TProperty>(Expression<Func<TModel, TProperty>> expression)
+        {
+            var element = FindElement(expression);
+            var rawValue = element.Text;
+            var value = new ValueProviderResult(rawValue, rawValue, CultureInfo.CurrentCulture).ConvertTo(typeof (TProperty));
+            return (TProperty) value;
+        }
+
         public void Set<TProperty>(Expression<Func<TModel, TProperty>> expression, TProperty value)
         {
             var element = FindElement(expression);
