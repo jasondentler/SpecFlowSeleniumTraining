@@ -24,15 +24,18 @@ namespace Specs.Infrastructure
             var args = string.Format("/ram --set=Raven/Port=={0}", portNumber);
             var si = new ProcessStartInfo(path, args)
             {
-                CreateNoWindow = true,
                 RedirectStandardInput = true,
-                UseShellExecute = false
+                UseShellExecute = false,
+                CreateNoWindow = true
             };
+            Console.WriteLine("Starting RavenDB in-memory server on port {0}", portNumber);
             return Process.Start(si);
         }
 
         private static void Stop(Process process)
         {
+            Console.WriteLine("Stopping RavenDB in-memory server");
+
             if (process.HasExited)
                 return;
 

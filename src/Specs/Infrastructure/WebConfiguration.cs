@@ -119,12 +119,13 @@ namespace Specs.Infrastructure
             return path;
         }
 
-        private static string BrowserName { get { return BrowserName.GetType().Name.Replace("Driver", string.Empty); } }
-
-        private void CleanUpBrowserInstance()
+        private static string BrowserName
         {
+            get
+            {
+                return _browserInstance.Browser.GetType().Name.Replace("Driver", string.Empty);
+            }
         }
-
 
         private static void StartBrowser()
         {

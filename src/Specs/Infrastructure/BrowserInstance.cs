@@ -15,6 +15,11 @@ namespace Specs.Infrastructure
         public BrowserInstance()
         {
             _browser = Settings.CreateWebDriver();
+            
+            _browser.Manage().Timeouts().ImplicitlyWait(TimeSpan.FromSeconds(15));
+            _browser.Manage().Timeouts().SetPageLoadTimeout(TimeSpan.FromSeconds(15));
+            _browser.Manage().Timeouts().SetScriptTimeout(TimeSpan.FromSeconds(15));
+
             _mainWindow = _browser.CurrentWindowHandle;
         }
 
