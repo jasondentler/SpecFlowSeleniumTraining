@@ -20,13 +20,11 @@ namespace UI
 
         public void OnActionExecuted(ActionExecutedContext filterContext)
         {
-            if (filterContext.IsChildAction)
-                return;
-
-            if (filterContext.Exception != null)
-                return;
-
-            _session.SaveChanges();
+            if (!filterContext.IsChildAction && filterContext.Exception == null)
+            {
+                _session.SaveChanges();
+            }
+            _session.Dispose();
         }
     }
 }

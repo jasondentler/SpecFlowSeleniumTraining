@@ -84,7 +84,7 @@ namespace Specs
             var expected = _widgets.ToDictionary(widget => widget.Id,
                                                  widget => widget.Name);
 
-            var widgetLinks = Browser.FindElements(By.XPath(""));
+            var widgetLinks = Browser.FindElements(By.XPath("//ul[@id='widgetList']//a"));
 
             var getIdFromUrl = new Func<string, int>(url =>
                                                          {
@@ -119,11 +119,23 @@ namespace Specs
             form.Set(m => m.Size, widget.Size);
             form.Submit(m => m.Name);
 
+            //var errors = Browser.FindElements(By.ClassName("error"));
+            //if (errors != null &&  errors.Any())
+            //{
+            //    Console.WriteLine("Widget creation failed with error(s):");
+            //    errors.ToList().ForEach(e => Console.WriteLine(e.Text));
+            //    return;
+            //}
+
             var match = new Regex(@"^widgets/(?<id>\d+)$").Match(RelativeUrl().ToString());
             if (match.Success)
             {
                 widget.Id = Convert.ToInt32(match.Groups["id"].Value);
                 _widgets.Add(widget);
+                Console.WriteLine("Widget {0} created", widget.Id);
+            } else
+            {
+                Console.WriteLine("Widget creation failed.");
             }
         }
     }

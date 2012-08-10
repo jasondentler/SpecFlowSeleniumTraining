@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Raven.Client;
 using UI.Models;
@@ -28,6 +29,7 @@ namespace UI.DataAccess
         public IEnumerable<WidgetSummary> GetAll()
         {
             return _session.Query<WidgetDetails>()
+                .Customize(x => x.WaitForNonStaleResults(TimeSpan.FromSeconds(1)))
                 .OrderBy(detail => detail.Name)
                 .Select(detail => new WidgetSummary()
                                       {

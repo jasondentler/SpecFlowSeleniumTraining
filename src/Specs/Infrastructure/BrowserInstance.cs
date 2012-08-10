@@ -15,10 +15,10 @@ namespace Specs.Infrastructure
         public BrowserInstance()
         {
             _browser = Settings.CreateWebDriver();
-            
-            _browser.Manage().Timeouts().ImplicitlyWait(TimeSpan.FromSeconds(15));
-            _browser.Manage().Timeouts().SetPageLoadTimeout(TimeSpan.FromSeconds(15));
-            _browser.Manage().Timeouts().SetScriptTimeout(TimeSpan.FromSeconds(15));
+
+            //_browser.Manage().Timeouts().SetPageLoadTimeout(TimeSpan.FromSeconds(15));
+            _browser.Manage().Timeouts().ImplicitlyWait(TimeSpan.FromSeconds(3));
+            _browser.Manage().Timeouts().SetScriptTimeout(TimeSpan.FromSeconds(3));
 
             _mainWindow = _browser.CurrentWindowHandle;
         }
@@ -32,13 +32,13 @@ namespace Specs.Infrastructure
 
         public void Reset()
         {
-            _mainWindow = _browser.WindowHandles.Contains(_mainWindow)
-                  ? _mainWindow
-                  : _browser.CurrentWindowHandle;
-            CloseWindows(_browser.WindowHandles.Except(new[] {_mainWindow}));
+            //_mainWindow = _browser.WindowHandles.Contains(_mainWindow)
+            //      ? _mainWindow
+            //      : _browser.CurrentWindowHandle;
+            //CloseWindows(_browser.WindowHandles.Except(new[] {_mainWindow}));
 
-            _browser.Navigate().GoToUrl("about:blank");
-            _browser.Manage().Cookies.DeleteAllCookies();
+            //_browser.Navigate().GoToUrl("about:blank");
+            //_browser.Manage().Cookies.DeleteAllCookies();
         }
 
         public IWebDriver Browser { get { return _browser; } }

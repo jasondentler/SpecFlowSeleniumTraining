@@ -22,7 +22,7 @@ namespace UI.App_Start
                 .ToMethod(ctx => store.OpenSession())
                 .InRequestScope();
 
-            Kernel.BindFilter<RavenGlobalFilter>(FilterScope.Controller, 0);
+            Kernel.BindFilter<RavenGlobalFilter>(FilterScope.Global, 0);
         }
     }
 }
