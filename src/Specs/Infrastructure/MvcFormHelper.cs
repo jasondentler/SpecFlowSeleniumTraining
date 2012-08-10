@@ -6,7 +6,7 @@ using OpenQA.Selenium;
 
 namespace Specs.Infrastructure
 {
-    public class MvcFormHelper<TModel> 
+    public class MvcFormHelper<TViewModel> 
     {
         private readonly IWebDriver _driver;
 
@@ -15,7 +15,7 @@ namespace Specs.Infrastructure
             _driver = driver;
         }
         
-        public TProperty Get<TProperty>(Expression<Func<TModel, TProperty>> expression)
+        public TProperty Get<TProperty>(Expression<Func<TViewModel, TProperty>> expression)
         {
             var element = FindElement(expression);
             var rawValue = element.Text;
@@ -23,7 +23,7 @@ namespace Specs.Infrastructure
             return (TProperty) value;
         }
 
-        public void Set<TProperty>(Expression<Func<TModel, TProperty>> expression, TProperty value)
+        public void Set<TProperty>(Expression<Func<TViewModel, TProperty>> expression, TProperty value)
         {
             var element = FindElement(expression);
             element.Clear();
@@ -34,23 +34,23 @@ namespace Specs.Infrastructure
             element.SendKeys(value.ToString());
         }
 
-        public void Submit<TProperty>(Expression<Func<TModel, TProperty>> expression)
+        public void Submit<TProperty>(Expression<Func<TViewModel, TProperty>> expression)
         {
             var element = FindElement(expression);
             element.Submit();
         }
 
-        public string FindElementName<TProperty>(Expression<Func<TModel, TProperty>> expression)
+        public string FindElementName<TProperty>(Expression<Func<TViewModel, TProperty>> expression)
         {
             return MvcContrib.UI.InputBuilder.Helpers.ReflectionHelper.BuildNameFrom(expression);
         }
 
-        public string FindElementId<TProperty>(Expression<Func<TModel, TProperty>> expression)
+        public string FindElementId<TProperty>(Expression<Func<TViewModel, TProperty>> expression)
         {
             return HtmlHelper.GenerateIdFromName(FindElementName(expression));
         }
 
-        public IWebElement FindElement<TProperty>(Expression<Func<TModel, TProperty>> expression)
+        public IWebElement FindElement<TProperty>(Expression<Func<TViewModel, TProperty>> expression)
         {
             return _driver.FindElement(By.Id(FindElementId(expression)));
         }
