@@ -32,13 +32,13 @@ namespace Specs.Infrastructure
 
         public void Reset()
         {
-            //_mainWindow = _browser.WindowHandles.Contains(_mainWindow)
-            //      ? _mainWindow
-            //      : _browser.CurrentWindowHandle;
-            //CloseWindows(_browser.WindowHandles.Except(new[] {_mainWindow}));
+            _mainWindow = _browser.WindowHandles.Contains(_mainWindow)
+                  ? _mainWindow
+                  : _browser.CurrentWindowHandle;
+            CloseWindows(_browser.WindowHandles.Except(new[] { _mainWindow }));
 
-            //_browser.Navigate().GoToUrl("about:blank");
-            //_browser.Manage().Cookies.DeleteAllCookies();
+            _browser.Navigate().GoToUrl("about:blank");
+            _browser.Manage().Cookies.DeleteAllCookies();
         }
 
         public IWebDriver Browser { get { return _browser; } }
