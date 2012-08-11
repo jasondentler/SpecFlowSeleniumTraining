@@ -4,9 +4,7 @@ using System.Diagnostics;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
-using System.Text;
 using OpenQA.Selenium;
-using Specs.Infrastructure.BrowserCache;
 
 namespace Specs.Infrastructure
 {
@@ -49,7 +47,6 @@ namespace Specs.Infrastructure
 
             Driver.Navigate().GoToUrl("about:blank");
             Driver.Manage().Cookies.DeleteAllCookies();
-            Driver.ClearCache();
         }
 
         public IWebDriver Driver { get; private set; }

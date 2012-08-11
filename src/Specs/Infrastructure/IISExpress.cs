@@ -129,7 +129,7 @@ namespace Specs.Infrastructure
             var regex = new Regex(pattern);
             var match = regex.Match(output);
 
-            if (!match.Success)
+            if (!match.Success || !match.Groups["url"].Success)
                 throw new ApplicationException("Unable to parse site url from IIS express startup text. Something went wrong.");
 
             _url = new Uri(match.Groups["url"].Value);

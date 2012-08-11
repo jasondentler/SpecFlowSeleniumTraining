@@ -1,17 +1,14 @@
 ﻿using System;
 using System.Diagnostics;
-using System.IO;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
-using System.Text.RegularExpressions;
 
 namespace Specs.Infrastructure
 {
     public class Raven : IInfrastructure
     {
 
-        private static readonly int? DefaultPort = GetRandomUnusedPort();
+        private static readonly int DefaultPort = GetRandomUnusedPort();
         private const string DefaultConnectionStringName = "RavenDB";
 
         public static int GetRandomUnusedPort()
@@ -24,15 +21,10 @@ namespace Specs.Infrastructure
         }
         
         private readonly Website _website;
-        private readonly int? _portNumber;
+        private readonly int _portNumber;
         private readonly string _connectionStringName;
 
         private Process _process;
-        private Uri _url;
-
-        public Uri Url { get { return _url; }}
-
-
 
         public Raven()
             : this(new Website(), DefaultPort, DefaultConnectionStringName)
@@ -54,7 +46,7 @@ namespace Specs.Infrastructure
         {
         }
 
-        public Raven(Website website, int? portNumber, string connectionStringName)
+        public Raven(Website website, int portNumber, string connectionStringName)
         {
             _website = website;
             _portNumber = portNumber;
@@ -70,7 +62,7 @@ namespace Specs.Infrastructure
         {
             _process = Start(_portNumber);
 
-            var connectionString = string.Format("Url={0}", _url);
+            var connectionString = string.Format("Url=http://localhost:{0}", _portNumber);
             _website.SetConnectionString(_connectionStringName, connectionString, null);
         }
 
@@ -78,13 +70,24 @@ namespace Specs.Infrastructure
         {
             if (_process != null && !_process.HasExited)
                 Stop(_process);
-            
         }
 
         public void Reset()
         {
-            if (_process != null && !_process.HasExited)
+            if (_process == null || _process.HasExited)
+            {
+                Start();
+                return;
+            }
+
+            if (_process.StartInfo.RedirectStandardInput)
+            {
                 _process.StandardInput.WriteLine("reset");
+                return;
+            }
+
+            Stop();
+            Start();
         }
 
         private Process Start(int? portNumber)
@@ -97,57 +100,56 @@ namespace Specs.Infrastructure
 
             var si = new ProcessStartInfo(path, args)
                          {
-                             RedirectStandardInput = true,
-                             RedirectStandardOutput = true,
+                             //RedirectStandardInput = true,
                              UseShellExecute = false,
                              CreateNoWindow = true
                          };
 
             Console.WriteLine("Starting RavenDB in-memory server on port {0}", portNumber);
             var process = Process.Start(si);
-            WaitForStartup(process);
+            //WaitForStartup(process);
             return process;
         }
 
-        private void WaitForStartup(Process process)
-        {
-            const string waitForText = "Available commands:";
-            var output = new StringBuilder();
-            var outputBuffer = new char[1000];
-            var stdout = process.StandardOutput;
-            Console.WriteLine("Waiting for RavenDB to start up.");
+        //private void WaitForStartup(Process process)
+        //{
+        //    const string waitForText = "Available commands:";
+        //    var output = new StringBuilder();
+        //    var outputBuffer = new char[1000];
+        //    var stdout = process.StandardOutput;
+        //    Console.WriteLine("Waiting for RavenDB to start up.");
 
-            var hasStarted = new Func<bool>(() => output.ToString().Contains(waitForText));
+        //    var hasStarted = new Func<bool>(() => output.ToString().Contains(waitForText));
 
-            while (!hasStarted() && !process.HasExited)
-            {
-                var outputLength = outputBuffer.Length;
-                while (!hasStarted() && !process.HasExited && outputLength == outputBuffer.Length)
-                {
-                    outputLength = stdout.Read(outputBuffer, 0, outputBuffer.Length);
-                    output.Append(outputBuffer, 0, outputLength);
-                    Console.Write(outputBuffer, 0, outputLength);
-                }
-            }
+        //    while (!hasStarted() && !process.HasExited)
+        //    {
+        //        var outputLength = outputBuffer.Length;
+        //        while (!hasStarted() && !process.HasExited && outputLength == outputBuffer.Length)
+        //        {
+        //            outputLength = stdout.Read(outputBuffer, 0, outputBuffer.Length);
+        //            output.Append(outputBuffer, 0, outputLength);
+        //            Console.Write(outputBuffer, 0, outputLength);
+        //        }
+        //    }
 
-            ParseUrl(output.ToString());
+        //    ParseUrl(output.ToString());
 
-        }
+        //}
 
-        private void ParseUrl(string output)
-        {
-            //Server Url: http://sputnik:8082/
-            const string pattern = "Server Url: (?<url>http://[^/]+/)";
-            var regex = new Regex(pattern, RegexOptions.Multiline);
-            var match = regex.Match(output);
+        //private void ParseUrl(string output)
+        //{
+        //    //Server Url: http://sputnik:8082/
+        //    const string pattern = "Server Url: (?<url>http://[^/]+/)";
+        //    var regex = new Regex(pattern, RegexOptions.Multiline);
+        //    var match = regex.Match(output);
 
-            if (!match.Success)
-            {
-                throw new ApplicationException("Unable to parse server url from RavenDB startup text. Something went wrong.");
-            }
+        //    if (!match.Success)
+        //    {
+        //        throw new ApplicationException("Unable to parse server url from RavenDB startup text. Something went wrong.");
+        //    }
 
-            _url = new Uri(match.Groups["url"].Value);
-        }
+        //    _url = new Uri(match.Groups["url"].Value);
+        //}
 
         private void Stop(Process process)
         {
@@ -156,8 +158,11 @@ namespace Specs.Infrastructure
             if (process.HasExited)
                 return;
 
-            process.StandardInput.WriteLine("q");
-            process.WaitForExit((int) TimeSpan.FromSeconds(5).TotalMilliseconds);
+            if (process.StartInfo.RedirectStandardInput)
+            {
+                process.StandardInput.WriteLine("q");
+                process.WaitForExit((int) TimeSpan.FromSeconds(5).TotalMilliseconds);
+            }
 
             if (process.HasExited)
                 return;

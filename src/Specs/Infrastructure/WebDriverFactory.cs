@@ -4,7 +4,6 @@ using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Firefox;
 using OpenQA.Selenium.IE;
-using Specs.Infrastructure.BrowserCache;
 
 namespace Specs.Infrastructure
 {
@@ -30,16 +29,7 @@ namespace Specs.Infrastructure
 
         private FirefoxDriver CreateFirefoxDriver()
         {
-            var profileManager = new FirefoxProfileManager();
-            var profile = profileManager.GetProfile(FirefoxProfileName);
-
-            if (profile != null)
-                profile.Clean(); // If it exists, delete it and recreate fresh
-
-            profileManager.CreateProfile(FirefoxProfileName);
-
-            profile = profileManager.GetProfile(FirefoxProfileName);
-            return new FirefoxDriver(new FirefoxBinary(), profile);
+            return new FirefoxDriver();
         }
 
 

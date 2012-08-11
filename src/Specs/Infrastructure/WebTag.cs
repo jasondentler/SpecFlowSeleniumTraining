@@ -11,13 +11,13 @@ namespace Specs.Infrastructure
     public class WebTag
     {
 
-        private static readonly IISExpress IISExpressInstance = new IISExpress();
+        //private static readonly IISExpress IISExpressInstance = new IISExpress();
         private static readonly Raven RavenInstance = new Raven();
         private static readonly Browser BrowserInstance = new Browser();
 
         private static IEnumerable<IInfrastructure> AllInfrastructure()
         {
-            yield return IISExpressInstance;
+            //yield return IISExpressInstance;
             yield return RavenInstance;
             yield return BrowserInstance;
         }
@@ -34,18 +34,27 @@ namespace Specs.Infrastructure
             AllInfrastructure().ToList().ForEach(i => i.Stop());
         }
 
+        private IISExpress _iisExpress;
+
         [BeforeScenario("web")]
         public void Setup()
         {
+            _iisExpress = new IISExpress();
+            _iisExpress.Start();
+
+            var url = _iisExpress.Url;
+            Console.WriteLine("Base Url is {0}", url == null ? "null" : url.ToString());
+
             AllInfrastructure().ToList().ForEach(i => i.Reset());
             ScenarioContext.Current.Set(BrowserInstance.Driver);
-            ScenarioContext.Current.Set(IISExpressInstance.Url);
+            ScenarioContext.Current.Set<Uri>(_iisExpress.Url);
         }
 
         [AfterScenario("web")]
         public void AfterWebScenario()
         {
             CaptureErrorInformation();
+            _iisExpress.Stop();
         }
 
         private static void CaptureErrorInformation()
