@@ -22,8 +22,7 @@ namespace Specs.Infrastructure
             _iisProcess = new IISProcess(8082);
             _iisProcess.Start();
 
-            if (Settings.BrowserScope == Settings.BrowserScopes.Singleton)
-                StartBrowser();
+            StartBrowser();
         }
 
         [AfterTestRun]
@@ -31,35 +30,17 @@ namespace Specs.Infrastructure
         {
             _iisProcess.Stop();
             _iisProcess.Dispose();
-            if (Settings.BrowserScope == Settings.BrowserScopes.Singleton)
-                StopBrowser();
-        }
-
-        [BeforeFeature("web")]
-        public static void SetupFeature()
-        {
-            if (Settings.BrowserScope == Settings.BrowserScopes.Feature)
-                StartBrowser();
-        }
-
-        [AfterFeature("web")]
-        public static void AfterFeature()
-        {
-            if (Settings.BrowserScope == Settings.BrowserScopes.Feature)
-                StopBrowser();
+            StopBrowser();
         }
 
         [BeforeScenario("web")]
         public void Setup()
         {
-            if (Settings.BrowserScope == Settings.BrowserScopes.Scenario)
-                StartBrowser();
-
             _ravenInstance = new RavenInstance();
 
             ScenarioContext.Current.Set(_browserInstance.Browser);
             ScenarioContext.Current.Set(_iisProcess.Url);
-            
+
             _browserInstance.Reset();
         }
 
@@ -68,9 +49,6 @@ namespace Specs.Infrastructure
         {
             _ravenInstance.Dispose();
             CaptureErrorInformation();
-
-            if (Settings.BrowserScope == Settings.BrowserScopes.Scenario)
-                StopBrowser();
         }
 
         private static void CaptureErrorInformation()
@@ -80,9 +58,9 @@ namespace Specs.Infrastructure
                 return;
 
             var driver = ScenarioContext.Current.Get<IWebDriver>();
-            
+
             CaptureHtml(driver);
-            
+
             var screenshotter = driver as ITakesScreenshot;
             if (screenshotter != null)
                 TakeErrorScreenshot(screenshotter);
@@ -94,7 +72,7 @@ namespace Specs.Infrastructure
             screenshotter.GetScreenshot().SaveAsFile(path, ImageFormat.Bmp);
             Console.Error.WriteLine("Screenshot: [\"" + path + "\"]");
         }
-        
+
         private static void CaptureHtml(IWebDriver driver)
         {
             var path = GetOutputDirectoryFilePath("html");
@@ -121,10 +99,7 @@ namespace Specs.Infrastructure
 
         private static string BrowserName
         {
-            get
-            {
-                return _browserInstance.Browser.GetType().Name.Replace("Driver", string.Empty);
-            }
+            get { return _browserInstance.Browser.GetType().Name.Replace("Driver", string.Empty); }
         }
 
         private static void StartBrowser()
@@ -138,8 +113,14 @@ namespace Specs.Infrastructure
             _browserInstance = null;
         }
 
-        public IWebDriver Browser { get { return _browserInstance.Browser; }}
+        public IWebDriver Browser
+        {
+            get { return _browserInstance.Browser; }
+        }
 
-        public Uri Url { get { return _iisProcess.Url; }}
+        public Uri Url
+        {
+            get { return _iisProcess.Url; }
+        }
     }
 }
