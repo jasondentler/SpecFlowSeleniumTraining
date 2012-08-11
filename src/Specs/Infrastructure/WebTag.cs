@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Diagnostics;
-using System.Drawing.Imaging;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using OpenQA.Selenium;
@@ -9,45 +8,43 @@ using TechTalk.SpecFlow;
 namespace Specs.Infrastructure
 {
     [Binding]
-    public class WebConfiguration
+    public class WebTag
     {
 
-        private static IISProcess _iisProcess;
-        private static BrowserInstance _browserInstance;
-        private RavenInstance _ravenInstance;
+        private static readonly IISExpress IISExpressInstance = new IISExpress();
+        private static readonly Raven RavenInstance = new Raven();
+        private static readonly Browser BrowserInstance = new Browser();
+
+        private static IEnumerable<IInfrastructure> AllInfrastructure()
+        {
+            yield return IISExpressInstance;
+            yield return RavenInstance;
+            yield return BrowserInstance;
+        }
 
         [BeforeTestRun]
         public static void Startup()
         {
-            _iisProcess = new IISProcess(8082);
-            _iisProcess.Start();
-
-            StartBrowser();
+            AllInfrastructure().ToList().ForEach(i => i.Start());
         }
 
         [AfterTestRun]
         public static void Shutdown()
         {
-            _iisProcess.Stop();
-            _iisProcess.Dispose();
-            StopBrowser();
+            AllInfrastructure().ToList().ForEach(i => i.Stop());
         }
 
         [BeforeScenario("web")]
         public void Setup()
         {
-            _ravenInstance = new RavenInstance();
-
-            ScenarioContext.Current.Set(_browserInstance.Browser);
-            ScenarioContext.Current.Set(_iisProcess.Url);
-
-            _browserInstance.Reset();
+            AllInfrastructure().ToList().ForEach(i => i.Reset());
+            ScenarioContext.Current.Set(BrowserInstance.Driver);
+            ScenarioContext.Current.Set(IISExpressInstance.Url);
         }
 
         [AfterScenario("web")]
         public void AfterWebScenario()
         {
-            _ravenInstance.Dispose();
             CaptureErrorInformation();
         }
 
@@ -61,22 +58,20 @@ namespace Specs.Infrastructure
 
             CaptureHtml(driver);
 
-            var screenshotter = driver as ITakesScreenshot;
-            if (screenshotter != null)
-                TakeErrorScreenshot(screenshotter);
+
         }
 
-        private static void TakeErrorScreenshot(ITakesScreenshot screenshotter)
+        private static void CaptureScreenshot()
         {
             var path = GetOutputDirectoryFilePath("bmp");
-            screenshotter.GetScreenshot().SaveAsFile(path, ImageFormat.Bmp);
+            BrowserInstance.TakeErrorScreenshot(path);
             Console.Error.WriteLine("Screenshot: [\"" + path + "\"]");
         }
 
         private static void CaptureHtml(IWebDriver driver)
         {
             var path = GetOutputDirectoryFilePath("html");
-            File.WriteAllText(path, driver.PageSource);
+            BrowserInstance.CaptureHtml(path);
             Console.Error.WriteLine("Html: [\"" + path + "\"]");
         }
 
@@ -99,28 +94,8 @@ namespace Specs.Infrastructure
 
         private static string BrowserName
         {
-            get { return _browserInstance.Browser.GetType().Name.Replace("Driver", string.Empty); }
+            get { return BrowserInstance.Driver.GetType().Name.Replace("Driver", string.Empty); }
         }
 
-        private static void StartBrowser()
-        {
-            _browserInstance = new BrowserInstance();
-        }
-
-        private static void StopBrowser()
-        {
-            _browserInstance.Dispose();
-            _browserInstance = null;
-        }
-
-        public IWebDriver Browser
-        {
-            get { return _browserInstance.Browser; }
-        }
-
-        public Uri Url
-        {
-            get { return _iisProcess.Url; }
-        }
     }
 }

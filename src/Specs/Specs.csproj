@@ -93,12 +93,22 @@
       <DependentUpon>DisplayWidgets.feature</DependentUpon>
     </Compile>
     <Compile Include="HomePageSteps.cs" />
-    <Compile Include="Infrastructure\BrowserInstance.cs" />
-    <Compile Include="Infrastructure\IISProcess.cs" />
+    <Compile Include="Infrastructure\Browser.cs" />
+    <Compile Include="Infrastructure\BrowserCache\ChromeBrowserCache.cs" />
+    <Compile Include="Infrastructure\BrowserCache\DirectoryBasedBrowserCache.cs" />
+    <Compile Include="Infrastructure\BrowserCache\FirefoxBrowserCache.cs" />
+    <Compile Include="Infrastructure\BrowserCache\FirefoxDriverExtensions.cs" />
+    <Compile Include="Infrastructure\BrowserCache\IBrowserCache.cs" />
+    <Compile Include="Infrastructure\BrowserCache\InternetExplorerBrowserCache.cs" />
+    <Compile Include="Infrastructure\BrowserCache\WebDriverExtensions.cs" />
+    <Compile Include="Infrastructure\IISExpress.cs" />
+    <Compile Include="Infrastructure\IInfrastructure.cs" />
     <Compile Include="Infrastructure\MvcFormHelper.cs" />
-    <Compile Include="Infrastructure\RavenProcess.cs" />
+    <Compile Include="Infrastructure\Raven.cs" />
+    <Compile Include="Infrastructure\WebDriverFactory.cs" />
+    <Compile Include="Infrastructure\Website.cs" />
     <Compile Include="Infrastructure\Settings.cs" />
-    <Compile Include="Infrastructure\WebConfiguration.cs" />
+    <Compile Include="Infrastructure\WebTag.cs" />
     <Compile Include="Infrastructure\WebSteps.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Site.feature.cs">

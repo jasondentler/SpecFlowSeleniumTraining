@@ -3,16 +3,28 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
+using System.Net;
+using System.Net.Sockets;
 using System.Text;
 using System.Text.RegularExpressions;
 
 namespace Specs.Infrastructure
 {
-
-    public class IISProcess : IDisposable
+    public class IISExpress : IInfrastructure
     {
 
-        private readonly string _websiteLocation;
+        private static readonly int? DefaultPortNumber = GetRandomUnusedPort();
+
+        public static int GetRandomUnusedPort()
+        {
+            var listener = new TcpListener(IPAddress.Any, 0);
+            listener.Start();
+            var port = ((IPEndPoint)listener.LocalEndpoint).Port;
+            listener.Stop();
+            return port;
+        }
+
+        private readonly Website _website;
         private readonly int? _portNumber;
         private readonly string _iisExpressPath;
         private Process _iisProcess;
@@ -20,49 +32,40 @@ namespace Specs.Infrastructure
 
         public Uri Url { get { return _url; } }
 
-        public IISProcess()
-            : this(GetWebsitePath(), null, GetIISExpressPath())
+        public IISExpress()
+            : this(new Website(), DefaultPortNumber, Settings.IISExpressPath)
         {
         }
 
-        public IISProcess(int portNumber)
-            : this(GetWebsitePath(), portNumber, GetIISExpressPath())
+        public IISExpress(Website website)
+            : this(website, DefaultPortNumber, Settings.IISExpressPath)
         {
         }
 
-        public IISProcess(string websiteLocation)
-            : this(websiteLocation, null, GetIISExpressPath())
-        {
-            _websiteLocation = websiteLocation;
-        }
-
-        public IISProcess(string websiteLocation, int portNumber)
-            : this(websiteLocation, portNumber, GetIISExpressPath())
+        public IISExpress(int portNumber)
+            : this(new Website(), portNumber)
         {
         }
 
-        private IISProcess(string websiteLocation, int? portNumber, string iisExpressPath)
+
+        public IISExpress(Website website, int portNumber)
+            : this(website, portNumber, Settings.IISExpressPath)
         {
-            _websiteLocation = websiteLocation;
+        }
+
+        private IISExpress(Website website, int? portNumber, string iisExpressPath)
+        {
+            _website = website;
             _portNumber = portNumber;
             _iisExpressPath = iisExpressPath;
         }
-
-        private static string GetWebsitePath()
-        {
-            return Settings.WebsitePath;
-        }
-
-        private static string GetIISExpressPath()
-        {
-            return Settings.IISExpressPath;
-        }
-
+        
         public void Start()
         {
             var args = new Dictionary<string, string>()
                            {
-                               {"path", string.Format("\"{0}\"", _websiteLocation)}
+                               {"path", string.Format("\"{0}\"", _website.Location)},
+                               {"trace", "info"}
                            };
 
             if (_portNumber.HasValue)
@@ -127,10 +130,7 @@ namespace Specs.Infrastructure
             var match = regex.Match(output);
 
             if (!match.Success)
-            {
-                Console.WriteLine(output);
                 throw new ApplicationException("Unable to parse site url from IIS express startup text. Something went wrong.");
-            }
 
             _url = new Uri(match.Groups["url"].Value);
         }
@@ -141,5 +141,13 @@ namespace Specs.Infrastructure
             Stop();
         }
 
+        public void Reset()
+        {
+            if (Settings.RecycleAppPoolBetweenTests)
+                _website.RecycleAppPool();
+        }
+
+
+        
     }
 }

@@ -15,7 +15,15 @@ namespace Specs.Infrastructure
     public static class Settings
     {
 
+        public enum Browsers
+        {
+            Firefox,
+            Chrome,
+            InternetExplorer
+        }
+
         private const string IISExpressPathKey = "IISExpressPath";
+        private const string AppPoolHardResetKey = "RecycleAppPoolBetweenTests";
         private const string WebsitePathKey = "WebsitePath";
         private const string BrowserKey = "Browser";
         private const string ChromeExecutableKey = "ChromeExecutable";
@@ -33,46 +41,44 @@ namespace Specs.Infrastructure
 
         public static string WebsitePath { get { return Path.GetFullPath(GetValue(WebsitePathKey)); } }
 
+        public static bool RecycleAppPoolBetweenTests
+        {
+            get 
+            { 
+                var value = GetValue(AppPoolHardResetKey) ?? "";
+                return value.ToLower() == "true";
+            }
+        }
+
         public static string RavenDbExecutablePath
         {
             get { return GetValue(RavenDbExecutablePathKey) ?? GetRavenDbServicePath(); }
         }
 
+        public static string ChromeExecutablePath { get { return GetValue(ChromeExecutableKey); } }
+
         public static string TestOutputDirectory { get { return GetValue(TestOutputDirectoryKey) ?? "."; } }
 
-        public static IWebDriver CreateWebDriver()
-        {
-            var name = GetValue(BrowserKey);
-            switch (name.ToLowerInvariant())
-            {
-                case "firefox":
-                    return new FirefoxDriver();
-                case "chrome":
-
-                    var options = new ChromeOptions();
-
-                    var exePath = GetValue(ChromeExecutableKey);
-
-                    if (File.Exists(exePath))
-                        options.BinaryLocation = exePath;
-
-                    return new ChromeDriver(options);
-
-                case "safari":
-                    return new SafariDriver();
-                case "ie":
-                case "ie7":
-                case "ie8":
-                case "ie9":
-                case "ie10":
-                case "internet explorer":
-                case "internetexplorer":
-                    return new InternetExplorerDriver();
-                default:
-                    throw new NotSupportedException(string.Format("{0} is not supported.", name));
+        public static Browsers Browser { 
+            get { 
+                var name = GetValue(BrowserKey) ?? "Firefox";
+                switch (name.ToLower())
+                {
+                    case "firefox":
+                        return Browsers.Firefox;
+                    case "chrome":
+                        return Browsers.Chrome;
+                    case "internetexplorer":
+                    case "ie":
+                        return Browsers.InternetExplorer;
+                    default:
+                        throw new NotSupportedException(
+                            string.Format("{0} is not a supported browser. Valid values are Firefox, Chrome, and IE",
+                                          name));
+                }
             }
         }
-
+        
         private static string GetRavenDbServicePath()
         {
             //HKLM\System\CurrentControlSet\Services\<%serviceNa me%>\ImagePath
