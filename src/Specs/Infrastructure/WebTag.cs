@@ -27,8 +27,6 @@ namespace Specs.Infrastructure
         public void Setup()
         {
             AllInfrastructure().ToList().ForEach(i => i.Start());
-
-            AllInfrastructure().ToList().ForEach(i => i.Reset());
             ScenarioContext.Current.Set(BrowserInstance.Driver);
             ScenarioContext.Current.Set<Uri>(IISExpressInstance.Url);
         }
