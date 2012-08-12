@@ -23,6 +23,7 @@ namespace Specs.Infrastructure
 
             Driver.Manage().Timeouts().ImplicitlyWait(TimeSpan.FromSeconds(3));
             Driver.Manage().Timeouts().SetScriptTimeout(TimeSpan.FromSeconds(3));
+            Driver.Manage().Cookies.DeleteAllCookies();
 
             _mainWindow = Driver.CurrentWindowHandle;
         }
